@@ -1,0 +1,94 @@
+---
+title: "Shiny App Project"
+author: "Jerin Timothy James"
+date: "`r Sys.Date()`"
+output: ioslides_presentation
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Shiny App Projecct
+
+This is an R Markdown presentation to pitch my Shiny App for plot manipulations.
+
+- The Shiny App is hosted on shinyapps.io
+- The code is in my public GitHub
+- This presentation includes the app demo
+
+This Shiny App allows a user to select a number of data points and choice of plot display desired, scatterplot or bar chart.
+
+First select the type of plot from the dropdown menu, then selected the number of data points from the slider, then hit update plot. A plot will be generated. Plots can be changed wihtout the need for hitting th eupdate plot button again if desired.
+
+## Shiny App for Plot Manipulation Demo
+
+```{r, echo = FALSE}
+library(shiny)
+shinyApp(
+  ui=fluidPage(
+  titlePanel("Plot Manipulation Shiny App"),
+  sidebarLayout(
+    sidebarPanel(
+      # Input widget: Select input with options
+      selectInput("plotType", "Select a Plot Type:", 
+                  choices = c("Scatterplot", "Barplot")),
+      sliderInput("numPoints", "Number of Data Points:", min = 10, max = 100, value = 50),
+      actionButton("updatePlot", "Update Plot")
+    ),
+    mainPanel(
+      # Output: Plot
+      plotOutput("outputPlot")
+    )
+  )
+),
+server=function(input, output) {
+  # Create a reactive data frame to store the data for the plot
+  data <- reactive({
+    num_points <- input$numPoints
+    if (input$plotType == "Scatterplot") {
+      data <- data.frame(x = rnorm(num_points), y = rnorm(num_points))
+    } else {
+      data <- data.frame(category = LETTERS[1:num_points], value = runif(num_points))
+    }
+    data
+  })
+
+  # Render the plot based on user input
+  output$outputPlot <- renderPlot({
+    if (input$plotType == "Scatterplot") {
+      plot(data()$x, data()$y, main = "Scatterplot", xlab = "X-axis", ylab = "Y-axis")
+    } else {
+      barplot(data()$value, names.arg = data()$category, main = "Barplot")
+    }
+  })
+  
+  # Add an observer to update the plot when the button is clicked
+  observeEvent(input$updatePlot, {
+    output$outputPlot <- renderPlot({
+      if (input$plotType == "Scatterplot") {
+        plot(data()$x, data()$y, main = "Scatterplot", xlab = "X-axis", ylab = "Y-axis")
+      } else {
+        barplot(data()$value, names.arg = data()$category, main = "Barplot")
+      }
+    })
+  })
+}
+  
+  
+  
+)
+```
+
+## Resources
+
+- ShinyApps.io dashboard site: https://www.shinyapps.io/admin/#/application/10423985
+- Deployed shinyapps.io URL: https://timjames1999.shinyapps.io/Plotchoice/
+- GitHub public repo with ReadMe and code: https://github.com/timjames1999/ShinyAppProject
+
+
+
+## Conclusion
+
+I have met the project requirements of creating a Shiny App, deploying it, showing the code, and creating a presenation about it.
